@@ -57,6 +57,10 @@
           </tbody>
         </table>
       </div>
+      <div v-if="mostrarAlerta" class="alerta">
+        <p>{{ mostrarAlerta }}</p>
+        <button @click="cerrarAlerta">Cerrar</button>
+      </div>
     </div>
   </div>
 </template>
@@ -69,17 +73,33 @@ let fecha = ref("");
 let priorizar = ref("");
 let tarea = ref("");
 
+const mostrarAlerta = ref("");
+
 function guardar() {
-  registros.value.push({
-    tarea: tarea.value,
-    priorizar: priorizar.value ? "Alta" : "Baja",
-    fecha: fecha.value,
-  });
-  ({
-    tarea: (tarea.value = ""),
-    priorizar: (priorizar.value = ""),
-    fecha: (fecha.value = ""),
-  });
+  if (tarea.value === "") {
+    mostrarAlerta.value = "Ingrese una tarea";
+  } else if (fecha.value === "") {
+    mostrarAlerta.value = "Ingrese una fecha";
+  } else if (new Date(fecha.value) < new Date()) {
+    mostrarAlerta.value = "La fecha no puede ser menor a la actual";
+  } else {
+    mostrarAlerta.value = "¡Registro exitoso!";
+
+    registros.value.push({
+      tarea: tarea.value,
+      priorizar: priorizar.value ? "Alta" : "Baja",
+      fecha: fecha.value,
+    });
+    ({
+      tarea: (tarea.value = ""),
+      priorizar: (priorizar.value = ""),
+      fecha: (fecha.value = ""),
+    });
+  }
+}
+
+function cerrarAlerta() {
+  mostrarAlerta.value = false;
 }
 function eliminar(i) {
   registros.value.splice(i, 1);
@@ -209,5 +229,42 @@ input[type="checkbox"] {
 .parte2 {
   display: grid;
   justify-content: center;
+}
+
+.alerta {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15%;
+  height: 15vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  border: 1px solid rgb(223, 43, 139);
+}
+
+button {
+  margin-top: 15px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: #ffffff;
+}
+button:hover {
+  border-color: #646cff;
 }
 </style>
